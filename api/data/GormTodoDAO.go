@@ -1,6 +1,9 @@
 package data
 
 import (
+	"errors"
+
+	"github.com/tommylay1902/crudbasic/internal/error/customerrors"
 	"github.com/tommylay1902/crudbasic/internal/models"
 	"gorm.io/gorm"
 )
@@ -34,6 +37,12 @@ func (dao *GormTodoDAO) FindByID(id int) (*models.Todo, error) {
 	todo := new(models.Todo)
 	err := dao.db.First(todo, id).Error
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, &customerrors.ResourceNotFound{
+				Message: "Todo not found",
+				Code:    404,
+			}
+		}
 		return nil, err
 	}
 	return todo, nil

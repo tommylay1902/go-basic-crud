@@ -1,8 +1,6 @@
 package services
 
 import (
-	"errors"
-
 	"github.com/tommylay1902/crudbasic/data"
 	"github.com/tommylay1902/crudbasic/models"
 )
@@ -41,10 +39,10 @@ func (tds *TodoService) GetAllTodos() ([]models.Todo, error) {
 func (tds *TodoService) DeleteTodo(id int) error {
 	todo, err := tds.TodoDAO.FindByID(id)
 	if err != nil {
-		return errors.New("error deleting")
+		return err
 	}
 	if err := tds.TodoDAO.DeleteTodo(todo); err != nil {
-		return errors.New("error deleting")
+		return err
 	}
 	return nil
 }

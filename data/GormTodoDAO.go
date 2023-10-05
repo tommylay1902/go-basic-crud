@@ -1,8 +1,6 @@
 package data
 
 import (
-	"errors"
-
 	"github.com/tommylay1902/crudbasic/models"
 	"gorm.io/gorm"
 )
@@ -32,13 +30,17 @@ func (dao *GormTodoDAO) CreateTodo(todo *models.Todo) error {
 
 func (dao *GormTodoDAO) FindByID(id int) (*models.Todo, error) {
 	todo := new(models.Todo)
-	dao.db.First(todo, id)
+	err := dao.db.First(todo, id).Error
+	if err != nil {
+		return nil, err
+	}
 	return todo, nil
 }
 
 func (dao *GormTodoDAO) DeleteTodo(todo *models.Todo) error {
-	if err := dao.db.Delete(&todo); err != nil {
-		return errors.New("yup")
+	err := dao.db.Delete(&todo).Error
+	if err != nil {
+		return err
 	} else {
 		return nil
 	}

@@ -1,11 +1,13 @@
 package handlers
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/tommylay1902/crudbasic/models"
 	"github.com/tommylay1902/crudbasic/services"
+	"gorm.io/gorm"
 )
 
 // UserHandler is a handler for user-related routes.
@@ -84,11 +86,28 @@ func (th *TodoHandler) DeleteTodoById(c *fiber.Ctx) error {
 	if err != nil {
 		// Handle invalid or non-integer ID (e.g., return an error response)
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid ID",
+			"error": "Bad Request",
 		})
-	}
-	th.TodoService.DeleteTodo(id)
-	// Send the todos as a JSON response
 
+	}
+
+	serviceErr := th.TodoService.DeleteTodo(id)
+
+	if serviceErr != nil {
+
+		if errors.Is(serviceErr, gorm.ErrRecordNotFound) {
+			return c.Status(fiber.StatusNotFound).JSON(
+				fiber.Map{
+					"error": "Todo was not found",
+				})
+		} else {
+			return c.Status(fiber.StatusInternalServerError).JSON(
+				fiber.Map{
+					"error": "Server error",
+				})
+		}
+	}
+
+	c.Status(fiber.StatusOK)
 	return nil
 }

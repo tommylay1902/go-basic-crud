@@ -1,6 +1,8 @@
 package services
 
 import (
+	"fmt"
+
 	"github.com/tommylay1902/crudbasic/data"
 	"github.com/tommylay1902/crudbasic/models"
 )
@@ -16,23 +18,29 @@ func NewTodoService(todoDAO data.TodoDAO) *TodoService {
 
 // CreateUser creates a new user.
 func (tds *TodoService) CreateTodo(todo *models.Todo) error {
-
-	return tds.TodoDAO.CreateTodo(todo)
+	err := tds.TodoDAO.CreateTodo(todo)
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+	return nil
 }
 
 // GetUserByID retrieves a user by ID.
 func (tds *TodoService) GetTodoById(todoID int) (*models.Todo, error) {
-	// Implement user retrieval logic here
-	// You can interact with your data models, database, etc.
-	todo, _ := tds.TodoDAO.FindByID(todoID)
+
+	todo, err := tds.TodoDAO.FindByID(todoID)
+	if err != nil {
+		return nil, err
+	}
 	return todo, nil
 }
 
-// GetUserByID retrieves a user by ID.
 func (tds *TodoService) GetAllTodos() ([]models.Todo, error) {
-	// Implement user retrieval logic here
-	// You can interact with your data models, database, etc.
-	todo, _ := tds.TodoDAO.GetAllTodos()
+	todo, err := tds.TodoDAO.GetAllTodos()
+	if err != nil {
+		return nil, err
+	}
 	return todo, nil
 }
 

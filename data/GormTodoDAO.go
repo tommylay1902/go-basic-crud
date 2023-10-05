@@ -19,12 +19,18 @@ func NewGormTodoDAO(db *gorm.DB) *GormTodoDAO {
 
 func (dao *GormTodoDAO) GetAllTodos() ([]models.Todo, error) {
 	var todo []models.Todo
-	dao.db.Find(&todo)
+	err := dao.db.Find(&todo).Error
+	if err != nil {
+		return nil, err
+	}
 	return todo, nil
 }
 
 func (dao *GormTodoDAO) CreateTodo(todo *models.Todo) error {
-	dao.db.Create(todo)
+	err := dao.db.Create(todo).Error
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

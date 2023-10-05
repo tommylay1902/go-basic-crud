@@ -1,45 +1,24 @@
 package main
 
 import (
-	"log"
-	"os"
-
 	"github.com/gofiber/fiber/v2"
-	"github.com/joho/godotenv"
-	"github.com/tommylay1902/crudbasic/data"
-	"github.com/tommylay1902/crudbasic/handlers"
-	"github.com/tommylay1902/crudbasic/models"
-	"github.com/tommylay1902/crudbasic/router"
-	"github.com/tommylay1902/crudbasic/services"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"github.com/tommylay1902/crudbasic/api/data"
+	"github.com/tommylay1902/crudbasic/api/handlers"
+	"github.com/tommylay1902/crudbasic/api/router"
+	"github.com/tommylay1902/crudbasic/api/services"
+	"github.com/tommylay1902/crudbasic/internal/config/db"
+	"github.com/tommylay1902/crudbasic/internal/config/environment"
 )
 
 func main() {
 
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-	portString := os.Getenv("PORT")
-
-	if portString == "" {
-		log.Fatal("Port is not specified")
-	}
-
-	dsn := "host=localhost user=postgres password=mysecretpassword dbname=postgres port=5432 sslmode=disable"
-
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		panic("Failed to connect to the database")
-	}
+	port := environment.SetupEnvironment()
+	db := db.SetupDB()
 
 	defer func() {
 		dbInstance, _ := db.DB()
 		_ = dbInstance.Close()
 	}()
-
-	db.AutoMigrate(&models.Todo{})
 
 	app := fiber.New()
 
@@ -49,6 +28,6 @@ func main() {
 
 	router.SetupTodoRoutes(app, todoHandler)
 
-	app.Listen(":" + portString)
+	app.Listen(":" + port)
 
 }
